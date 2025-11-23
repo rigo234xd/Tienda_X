@@ -1,77 +1,38 @@
-import { useEffect, useState } from "react";
-import { getProducts } from "./api/productos";
+// App.jsx
+import { useState } from "react";
+import ListaProductos from "./components/ListaProductos";
+import CrearProducto from "./components/CrearProducto";
+import EditarProducto from "./components/EditarProducto";
+import EliminarProducto from "./components/EliminarProducto";
 
 function App() {
-  const [products, setProducts] = useState([]);
+  const [editando, setEditando] = useState(null);
+  const [eliminando, setEliminando] = useState(null);
+  const [refrescar, setRefrescar] = useState(false);
 
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        const data = await getProducts();
-        setProducts(data);
-      } catch (err) {
-        console.error("Error al cargar productos:", err);
-      }
-    }
-
-    loadProducts();
-  }, []);
+  function reload() {
+    setRefrescar(!refrescar);
+    setEditando(null);
+    setEliminando(null);
+  }
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Tienda de Productos</h1>
+    <div className="container">
+      <h1>🛒 Gestor de Productos</h1>
 
-      <div style={styles.grid}>
-        {products.map((p) => (
-          <div key={p.id} style={styles.card}>
-            <img
-              src={p.imagen}
-              alt={p.nombre}
-              style={{
-                width: "100%",
-                borderRadius: "10px",
-                marginBottom: "10px",
-              }}
-            />
+      <CrearProducto onCreated={reload} />
 
-            <h2 style={styles.cardTitle}>{p.nombre}</h2>
-            <p style={styles.price}>${p.precio.toLocaleString()}</p>
-          </div>
-        ))}
-      </div>
+      <ListaProductos
+        key={refrescar}
+        onEdit={(p) => setEditando(p)}
+        onDelete={(id) => setEliminando(id)}
+      />
+
+      <EditarProducto producto={editando} onUpdated={reload} />
+
+      <EliminarProducto id={eliminando} onDeleted={reload} />
     </div>
   );
 }
 
 export default App;
-
-const styles = {
-  container: {
-    padding: "20px",
-    fontFamily: "sans-serif",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)", // 2 columnas
-    gap: "20px",
-  },
-  card: {
-    background: "#f7f7f7",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0px 2px 6px rgba(0,0,0,0.15)",
-    textAlign: "center",
-  },
-  cardTitle: {
-    margin: 0,
-    marginBottom: "10px",
-  },
-  price: {
-    fontWeight: "bold",
-    fontSize: "18px",
-  },
-};
