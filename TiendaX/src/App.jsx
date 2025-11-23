@@ -24,6 +24,16 @@ function App() {
       <div style={styles.grid}>
         {products.map((p) => (
           <div key={p.id} style={styles.card}>
+            <img
+              src={p.imagen}
+              alt={p.nombre}
+              style={{
+                width: "100%",
+                borderRadius: "10px",
+                marginBottom: "10px",
+              }}
+            />
+
             <h2 style={styles.cardTitle}>{p.nombre}</h2>
             <p style={styles.price}>${p.precio.toLocaleString()}</p>
           </div>
@@ -46,7 +56,7 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)", // 👉 2 columnas
+    gridTemplateColumns: "repeat(2, 1fr)", // 2 columnas
     gap: "20px",
   },
   card: {
@@ -57,7 +67,7 @@ const styles = {
     textAlign: "center",
   },
   cardTitle: {
-    margin: "0",
+    margin: 0,
     marginBottom: "10px",
   },
   price: {
