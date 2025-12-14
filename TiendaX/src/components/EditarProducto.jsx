@@ -30,7 +30,7 @@ export default function EditarProducto({ producto, onUpdated }) {
 
   return (
     <form onSubmit={enviar}>
-      <h2>✏ Editar Producto</h2>
+      <h2> Editar Producto</h2>
 
       <input
         type="text"

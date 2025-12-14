@@ -11,7 +11,7 @@ export default function EliminarProducto({ id, onDeleted }) {
 
   return (
     <div>
-      <h2>❌ Eliminar Producto</h2>
+      <h2> Eliminar Producto</h2>
       <p>¿Seguro que deseas eliminar este producto?</p>
       <button onClick={confirmar}>Sí, eliminar</button>
     </div>

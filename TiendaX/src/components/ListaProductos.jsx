@@ -1,33 +1,77 @@
 import { useEffect, useState } from "react";
-import { getProducts } from "../api/productos";
+import { getProducts, deleteProduct } from "../api/productos"; 
+import ProductCard from "./ProductCard";
+import Busqueda from "./Busqueda"; // ¡Importamos el nuevo componente!
 
 export default function ListaProductos({ onEdit, onDelete }) {
-  const [productos, setProductos] = useState([]);
+  // 1. Lista COMPLETA (se carga una vez)
+  const [productosOriginales, setProductosOriginales] = useState([]); 
+  // 2. Lista FILTRADA (la que se renderiza)
+  const [productosFiltrados, setProductosFiltrados] = useState([]);
+  
+  // 3. Término de búsqueda
+  const [searchTerm, setSearchTerm] = useState(""); 
 
+  // Carga inicial de productos
   useEffect(() => {
-    cargar();
-  }, []);
+    cargarProductos();
+  }, [onDelete]); 
 
-  async function cargar() {
-    const data = await getProducts();
-    setProductos(data);
+  async function cargarProductos() {
+    try {
+      const data = await getProducts();
+      setProductosOriginales(data); 
+      setProductosFiltrados(data);  
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+    }
   }
 
+  // Función para manejar la eliminación (si ya la tienes, mantenla)
+  async function handleEliminar(id) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+      try {
+        await deleteProduct(id);
+        onDelete(); // Notifica a App.jsx para que recargue (llama a cargarProductos)
+      } catch (error) {
+        console.error("Error al eliminar el producto:", error);
+      }
+    }
+  }
+
+  // Lógica de filtrado: Se ejecuta cuando cambia searchTerm o la lista original
+  useEffect(() => {
+    if (searchTerm === "") {
+      setProductosFiltrados(productosOriginales);
+      return;
+    }
+
+    const filtered = productosOriginales.filter(producto =>
+      // Filtra por nombre (insensible a mayúsculas/minúsculas)
+      producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setProductosFiltrados(filtered);
+    
+  }, [searchTerm, productosOriginales]); 
+
   return (
-    <div className="grid">
-      {productos.map((p) => (
-        <div key={p.id} className="card">
-          <img src={p.imagen} className="img" alt={p.nombre} />
+    <>
+      {/* Colocamos la barra de búsqueda */}
+      <Busqueda onSearch={setSearchTerm} /> 
 
-          <h3>{p.nombre}</h3>
-          <p>${p.precio}</p>
-
-          <div className="row">
-            <button onClick={() => onEdit(p)}>Editar</button>
-            <button onClick={() => onDelete(p.id)}>Eliminar</button>
-          </div>
-        </div>
-      ))}
-    </div>
+      <div className="product-grid"> 
+        {productosFiltrados.map((p) => ( // Mapeamos la lista FILTRADA
+          <ProductCard
+            key={p.id}
+            producto={p}
+            onEdit={onEdit}
+            onDelete={handleEliminar} 
+          />
+        ))}
+        {productosFiltrados.length === 0 && (
+          <p className="no-results">No se encontraron productos para "{searchTerm}"</p>
+        )}
+      </div>
+    </>
   );
 }
