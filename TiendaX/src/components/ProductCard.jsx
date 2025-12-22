@@ -1,16 +1,10 @@
-export default function ProductCard({ producto, onEdit, onDelete }) {
-  const handleDeleteClick = () => {
-    // Asegurarse de que onDelete es la función que llama a deleteProduct(id)
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${producto.nombre}"?`)) {
-      onDelete(producto.id);
-    }
-  };
-
+// Agregamos la prop isAdmin que por defecto es false
+export default function ProductCard({ producto, isAdmin = false, onEdit, onDelete }) {
+  
   return (
-    // Usamos una clase única para la tarjeta
     <div className="product-item-card">
       
-      {/* Contenedor de la Imagen */}
+      {/* Contenedor de la Imagen - SE MANTIENE IGUAL */}
       <div className="product-image-wrapper"> 
         {producto.imagen ? (
           <img
@@ -25,24 +19,31 @@ export default function ProductCard({ producto, onEdit, onDelete }) {
         )}
       </div>
 
-      {/* Información del Producto */}
+      {/* Información del Producto - SE MANTIENE IGUAL */}
       <h3 className="product-name">{producto.nombre}</h3>
       <p className="product-price">${parseFloat(producto.precio).toFixed(2)}</p>
 
-      {/* Botones de Acción */}
+      {/* SECCIÓN DE ACCIONES - EDITADA */}
       <div className="product-actions"> 
-        <button
-          onClick={() => onEdit(producto)}
-          className="btn-edit-card"
-        >
-          Editar
-        </button>
-        <button
-          onClick={handleDeleteClick}
-          className="btn-delete-card"
-        >
-          Eliminar
-        </button>
+        {isAdmin ? (
+          // Si es admin, mostramos lo que ya tenías
+          <>
+            <button onClick={() => onEdit(producto)} className="btn-edit-card">
+              Editar
+            </button>
+            <button onClick={() => onDelete(producto.id)} className="btn-delete-card">
+              Eliminar
+            </button>
+          </>
+        ) : (
+          // Si es USUARIO, mostramos botones de compra o detalles
+          <button 
+            className="btn-add-cart" 
+            onClick={() => console.log("Añadido al carrito", producto.id)}
+          >
+            Añadir al carrito
+          </button>
+        )}
       </div>
     </div>
   );
