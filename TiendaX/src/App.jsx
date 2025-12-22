@@ -1,77 +1,37 @@
-import { useEffect, useState } from "react";
-import { getProducts } from "./api/productos";
+import { useState } from "react";
+import ListaProductos from "./components/ListaProductos";
+import "./App.css";
 
-function App() {
-  const [products, setProducts] = useState([]);
+export default function App() {
+  // Solo mantenemos el término de búsqueda y el estado de recarga (opcional)
+  const [reload, setReload] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(''); 
 
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        const data = await getProducts();
-        setProducts(data);
-      } catch (err) {
-        console.error("Error al cargar productos:", err);
-      }
-    }
-
-    loadProducts();
-  }, []);
+  function refrescar() {
+    setReload(!reload);
+  }
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Tienda de Productos</h1>
+    <div className="app-container">
+      {/* Puedes agregar un header más amigable para el usuario */}
+      <header className="user-header">
+        <h1 className="titulo"> Nuestra Tienda</h1>
+      </header>
 
-      <div style={styles.grid}>
-        {products.map((p) => (
-          <div key={p.id} style={styles.card}>
-            <img
-              src={p.imagen}
-              alt={p.nombre}
-              style={{
-                width: "100%",
-                borderRadius: "10px",
-                marginBottom: "10px",
-              }}
-            />
-
-            <h2 style={styles.cardTitle}>{p.nombre}</h2>
-            <p style={styles.price}>${p.precio.toLocaleString()}</p>
-          </div>
-        ))}
-      </div>
+      {/* LISTA DE PRODUCTOS 
+         Quitamos onEdit y onDelete ya que el usuario no tiene estas funciones.
+         Si modificaste ProductCard con la prop 'isAdmin', aquí no la pasas.
+      */}
+      <ListaProductos
+        key={reload} 
+        onSearch={setSearchTerm} 
+        searchTerm={searchTerm}  
+      />
+      
+      {/* Footer simple opcional */}
+      <footer className="footer">
+        <p>© 2024 Tienda de Productos - Todos los derechos reservados</p>
+      </footer>
     </div>
   );
 }
-
-export default App;
-
-const styles = {
-  container: {
-    padding: "20px",
-    fontFamily: "sans-serif",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)", // 2 columnas
-    gap: "20px",
-  },
-  card: {
-    background: "#f7f7f7",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0px 2px 6px rgba(0,0,0,0.15)",
-    textAlign: "center",
-  },
-  cardTitle: {
-    margin: 0,
-    marginBottom: "10px",
-  },
-  price: {
-    fontWeight: "bold",
-    fontSize: "18px",
-  },
-};
